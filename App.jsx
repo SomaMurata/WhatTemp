@@ -15,7 +15,9 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState(null);
 
   const weatherURL = 'https://api.openweathermap.org/data/2.5/weather';
+  // const weatherURL = 'https://api.openweathermap.org/data/2.5/weather?lat=35.51101&lon=139.56712&lang=ja&appid=57e4ad1e13407946c7dcc2f1dd7d8009';
 
+  // 緯度経度取得
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -31,23 +33,23 @@ export default function App() {
   }, []);
   console.log(latitude, longitude);
 
+  // 緯度経度情報からAPIで気温を取得
   const fetchWeather = async () => {
     try {
-      const lat = 39;
-      const lon = 139;
-      const response = await axios.get(
-        `${weatherURL}?lat=${lat}&lon=${lon},JP&lang=ja&appid=${weatherAPIKey}`,
-      );
+      const lat = latitude;
+      const lon = longitude;
+      const response = await axios.get(`${weatherURL}?lat=${lat}&lon=${lon}&appid=${weatherAPIKey}`);
       const { data } = response;
-      return data.main[0].temp;
+      console.log(data);
+      return (((data.main.temp) * 100) - 27315) / 100;
     } catch (error) {
       return '天気情報の取得に失敗しました。';
     }
   };
-
+  // 現在地の温度を取得
   async function handlePress() {
     const currentWeather = await fetchWeather();
-    setWeather(currentWeather);
+    setWeather(`${currentWeather} ℃`);
   }
 
   return (
